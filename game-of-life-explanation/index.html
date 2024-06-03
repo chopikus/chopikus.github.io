@@ -145,9 +145,14 @@ void Hashlife::_append_alive_cells(const NodePtr& node, std::vector&ltCell&gt& o
 }</code></pre>
       <h4>File format</h4>
       The description of .rle file format is here: <a href="https://conwaylife.com/wiki/Run_Length_Encoded">https://conwaylife.com/wiki/Run_Length_Encoded</a> 
+      <h4>Emscripten-level optimizations</h4>
+      <p>To draw the cells, the C++ backend passes the list of ON cells.
+         Since each cell is simply a pair of numbers, the faster option is to create array on heap in C++ and pass the memory view to JS. </p>
+      <a href="https://emscripten.org/docs/porting/connecting_cpp_and_javascript/embind.html#memory-views">See this Emscripten doc for more info. </a>
       <h3>Limitations</h3>
       <ul>
       <li>The computation and the drawing is done on a single core; this leads to a slower performance than compared to the <a href="https://golly.sourceforge.io/">Golly</a> client for example.</li>
+      <li>Parsing large files (16MB) takes a lot of time (10s+).</li>
       </ul>
       <h3>Attribution</h3>
       Thanks to:
