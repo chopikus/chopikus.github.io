@@ -100,22 +100,22 @@
         <p>This Node class structure works well enough:</p>
         <pre>
           <code>
-            struct Node {
-              /* ____
-                /    \
-                |A  B|
-                |C  D|
-                \___/
-              */
-              uint8_t kn; // first bit n, rest bits -- k
-              std::shared_ptr&ltNode&gt a,b,c,d;
-              uint64_t hash; // precomputed
-      
-              auto operator<=>(const Node&) const = default;
-              
-              uint8_t k() const;
-              bool n() const;
-            };
+          struct Node {
+            /* ____
+              /    \
+              |A  B|
+              |C  D|
+              \___/
+            */
+            uint8_t kn; // first bit n, rest bits -- k
+            std::shared_ptr&ltNode&gt a,b,c,d;
+            uint64_t hash; // precomputed
+    
+            auto operator<=>(const Node&) const = default;
+            
+            uint8_t k() const;
+            bool n() const;
+          };
           </code>
         </pre>
         <p>To prevent memory leaks and easily track Node's reference count, <code>std::shared_ptr</code> is used.
@@ -127,28 +127,28 @@
         <p>In code it looks roughly like this:</p>
         <pre>
           <code>
-            /*Following function pushes coordinates of ON cells in node up with (2^level):1 precision.*/
-            void Hashlife::_append_alive_cells(const NodePtr& node, std::vector&ltCell&gt& output,
-                                              uint8_t level, 
-                                              int64_t x, int64_t y,
-                                              int64_t min_x, int64_t min_y,
-                                              int64_t max_x, int64_t max_y) {
-                /* if current node doesn't have any ON cells, pass*/
-                if (!node->n()) {
-                    return;
-                }
-            
-                if (node->k() == level) {
-                    output.push_back({x, y});
-                    return;
-                }
-            
-                int64_t offset = size >> 1;
-                _append_alive_cells(node->a, output, level, x, y, min_x, min_y, max_x, max_y);
-                _append_alive_cells(node->b, output, level, x + offset, y, min_x, min_y, max_x, max_y);
-                _append_alive_cells(node->c, output, level, x, y + offset, min_x, min_y, max_x, max_y);
-                _append_alive_cells(node->d, output, level, x + offset, y + offset, min_x, min_y, max_x, max_y);
-            }
+          /*Following function pushes coordinates of ON cells in node up with (2^level):1 precision.*/
+          void Hashlife::_append_alive_cells(const NodePtr& node, std::vector&ltCell&gt& output,
+                                            uint8_t level, 
+                                            int64_t x, int64_t y,
+                                            int64_t min_x, int64_t min_y,
+                                            int64_t max_x, int64_t max_y) {
+              /* if current node doesn't have any ON cells, pass*/
+              if (!node->n()) {
+                  return;
+              }
+          
+              if (node->k() == level) {
+                  output.push_back({x, y});
+                  return;
+              }
+          
+              int64_t offset = size >> 1;
+              _append_alive_cells(node->a, output, level, x, y, min_x, min_y, max_x, max_y);
+              _append_alive_cells(node->b, output, level, x + offset, y, min_x, min_y, max_x, max_y);
+              _append_alive_cells(node->c, output, level, x, y + offset, min_x, min_y, max_x, max_y);
+              _append_alive_cells(node->d, output, level, x + offset, y + offset, min_x, min_y, max_x, max_y);
+          }
           </code>
         </pre>
       <h4>File format</h4>
