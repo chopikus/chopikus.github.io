@@ -164,6 +164,9 @@
           <li>Generation speed seems to be off, at least on small values (1, 2 gen/s) </li>
           <li>Computation is done on the main thread, leading to slow reaction on user input on large patterns (button clicks, panning, zoom, etc.) </li>
         </ul>
+      <h4>Memory issues</h4>
+      <p>For some reason, compiling a Game of Life client with Emscripten version 3.1.59+ results in `memory access out of bounds` error. See <a href="https://github.com/emscripten-core/emscripten/issues/22041">this Github issue</a> for more details. For now, the client is compiled against an older Emscripten version.</p>
+
       <h3>Attribution</h3>
       Thanks to:
         <ul>
