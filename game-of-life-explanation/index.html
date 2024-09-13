@@ -5,24 +5,26 @@
     <title>Conway's Game of Life: Modern Emscripten Implementation</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <head>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
+        <link rel="stylesheet" href="https://fonts.xz.style/serve/inter.css">
+        <link rel="stylesheet" href="../new.css">
     </head>
   </head>
   <body>
-      <header>
-        <h2>Conway's Game of Life: Emscripten Implementation</h2>
-      </header>
-        Written by <a href="https://chopikus.github.io">Igor Chovpan</a>
-        <br><a class="github-button" href="https://github.com/chopikus/game-of-life" data-color-scheme="no-preference: light; light: light; dark: dark;" data-icon="octicon-star" data-size="large" aria-label="Star buttons/github-buttons on GitHub">Star</a>
-      <figure>
-      <video width="850" height="500" controls autoplay muted>
-         <source src="demo.mp4" type="video/mp4">     
-      </video>
-      <figcaption style="text-align: center;">
-          Metagalaxy pattern, size 31000x31000, running on Windows 11.
-          <br> <a href="https://github.com/chopikus/game-of-life/blob/main/rle_examples/metagalaxy.rle">link to pattern</a>
-      </figcaption>
+      <div style="margin-bottom:20px;">
+      <h2>Conway's Game of Life: Emscripten Implementation</h2>
+      <a class="github-button" href="https://github.com/chopikus/game-of-life" data-color-scheme="no-preference: light; light: light; dark: dark;" data-icon="octicon-star" data-size="large" aria-label="Star buttons/github-buttons on GitHub">Star</a>
+      </div>
+
+      <figure style="width: 100%;">
+          <video style="width: 100%;" controls autoplay muted>
+             <source src="demo.mp4" type="video/mp4">     
+          </video>
+          <figcaption style="text-align: center;">
+              Metagalaxy pattern, size 31000x31000, running on Windows 11.
+              <br> <a href="https://github.com/chopikus/game-of-life/blob/main/rle_examples/metagalaxy.rle">link to pattern</a>
+          </figcaption>
       </figure>
+
       <h3>Usage:</h3>
       <ul>
           <li>Download any .rle pattern, for example from <a href="https://github.com/chopikus/game-of-life/tree/main/rle_examples">here</a>.
@@ -32,7 +34,7 @@
       </ul>
       <h3>Game description</h3>
       <p>Conway's Game of Life is one of the most well-known cellular automata.
-         <br>It was developed by the British mathematician <a href="https://en.wikipedia.org/wiki/John_Horton_Conway">John Conway</a> in 1970.
+      <p>It was developed by the British mathematician <a href="https://en.wikipedia.org/wiki/John_Horton_Conway">John Conway</a> in 1970.
       </p>
       <p>The game rules are simple:</p>
       <ul>
@@ -58,15 +60,14 @@
 
       <h3>Computing next generation</h3>
         <h4>First approach: Direct implementation</h4>
-        <p>The simplest algorithm to compute next generation is a direct one, storing all the cells of a finite grid.
-        <br> Note that we need to store current and next generation separately on computation: otherwise cells won't be computed all at once.
-        <br> Overall it requries O(n*m) time and space to compute one generation forward.</p>
+        <p>The simplest algorithm to compute next generation is a direct one, storing all the cells of a finite grid.</p>
+        <p> Note that we need to store current and next generation separately on computation: otherwise cells won't be computed all at once.</p>
+        <p> Overall it requries O(n*m) time and space to compute one generation forward.</p>
         <p> The disadvantages of this approach are clear, it doesn't work fast enough for big patterns, and requires too much memory. </p>
         <h4>Second approach: assuming there are far less ON cells than OFF cells</h4>
-        <p>Instead of storing all cells of the grid it is sufficient to store the positions of ON cells.
-        <br>We could compute the result for less cells as well: if all of our neighbours have OFF state, the cell will be OFF for the next generation. </p>
-        <p>If all active cells at current generation are inside of rectangle ((min_x, min_y), (max_x, max_y)), it is sufficient to compute next cells in rectangle ((min_x-1, min_y-1), (max_x+1, max_y+1)).
-        </p>
+        <p>Instead of storing all cells of the grid it is sufficient to store the positions of ON cells.</p>
+        <p>We could compute the result for less cells as well: if all of our neighbours have OFF state, the cell will be OFF for the next generation. </p>
+        <p>If all active cells at current generation are inside of rectangle ((min_x, min_y), (max_x, max_y)), it is sufficient to compute next cells in rectangle ((min_x-1, min_y-1), (max_x+1, max_y+1)).</p>
         <figure style="text-align: center;">
         <img src="c.png" style="height:150px;">
         <figcaption style="text-align: center;">Notice that we don't need to compute the result for red cells.</figcaption>
@@ -98,59 +99,51 @@
         <p>Since Hashlife algorithm heavily relies on caching results, it requires a lot of RAM.</p>
         <p>Therefore, saving some memory on nodes is preferred.</p>
         <p>This Node class structure works well enough:</p>
-        <pre>
-          <code>
-          struct Node {
-            /* ____
-              /    \
-              |A  B|
-              |C  D|
-              \___/
-            */
-            uint8_t kn; // first bit n, rest bits -- k
-            std::shared_ptr&ltNode&gt a,b,c,d;
-            uint64_t hash; // precomputed
+<pre><code>struct Node {
+    /* ____
+      /    \
+      |A  B|
+      |C  D|
+      \___/
+    */
+    uint8_t kn; // first bit n, rest bits -- k
+    std::shared_ptr&ltNode&gt a,b,c,d;
+    uint64_t hash; // precomputed
+
+    auto operator<=>(const Node&) const = default;
     
-            auto operator<=>(const Node&) const = default;
-            
-            uint8_t k() const;
-            bool n() const;
-          };
-          </code>
-        </pre>
-        <p>To prevent memory leaks and easily track Node's reference count, <code>std::shared_ptr</code> is used.
+    uint8_t k() const;
+    bool n() const;
+};</code></pre>
+    <p>To prevent memory leaks and easily track Node's reference count, <code>std::shared_ptr</code> is used.
         <br>Although some might say <code>std::shared_ptr</code> uses too much memory, it helps remove quite a lot of unused nodes when running, saving quite a lot of RAM.</p>
         <h4>Downsampling</h4>
         <p>What happens if we scale out so much that one pixel corresponds to more than one cell?
         <br>Drawing the same pixel multiple times doesn't seem as a great idea.
         <br>To fix that, the following is usually done: if a whole square of 2^k by 2^k pixels corresponds to one pixel, we draw that pixel white if that square has at least one ON cell.</p>  
         <p>In code it looks roughly like this:</p>
-        <pre>
-          <code>
-          /*Following function pushes coordinates of ON cells in node up with (2^level):1 precision.*/
-          void Hashlife::_append_alive_cells(const NodePtr& node, std::vector&ltCell&gt& output,
-                                            uint8_t level, 
-                                            int64_t x, int64_t y,
-                                            int64_t min_x, int64_t min_y,
-                                            int64_t max_x, int64_t max_y) {
-              /* if current node doesn't have any ON cells, pass*/
-              if (!node->n()) {
-                  return;
-              }
-          
-              if (node->k() == level) {
-                  output.push_back({x, y});
-                  return;
-              }
-          
-              int64_t offset = size >> 1;
-              _append_alive_cells(node->a, output, level, x, y, min_x, min_y, max_x, max_y);
-              _append_alive_cells(node->b, output, level, x + offset, y, min_x, min_y, max_x, max_y);
-              _append_alive_cells(node->c, output, level, x, y + offset, min_x, min_y, max_x, max_y);
-              _append_alive_cells(node->d, output, level, x + offset, y + offset, min_x, min_y, max_x, max_y);
-          }
-          </code>
-        </pre>
+<pre><code>/*Following function pushes coordinates of ON cells in node up with (2^level):1 precision.*/
+void Hashlife::_append_alive_cells(const NodePtr& node, std::vector&ltCell&gt& output,
+                                  uint8_t level, 
+                                  int64_t x, int64_t y,
+                                  int64_t min_x, int64_t min_y,
+                                  int64_t max_x, int64_t max_y) {
+    /* if current node doesn't have any ON cells, pass*/
+    if (!node->n()) {
+        return;
+    }
+
+    if (node->k() == level) {
+        output.push_back({x, y});
+        return;
+    }
+
+    int64_t offset = size >> 1;
+    _append_alive_cells(node->a, output, level, x, y, min_x, min_y, max_x, max_y);
+    _append_alive_cells(node->b, output, level, x + offset, y, min_x, min_y, max_x, max_y);
+    _append_alive_cells(node->c, output, level, x, y + offset, min_x, min_y, max_x, max_y);
+    _append_alive_cells(node->d, output, level, x + offset, y + offset, min_x, min_y, max_x, max_y);
+}</code></pre>
       <h4>File format</h4>
         The description of .rle file format is here: <a href="https://conwaylife.com/wiki/Run_Length_Encoded">https://conwaylife.com/wiki/Run_Length_Encoded</a> 
       <h4>Emscripten-level optimizations</h4>
