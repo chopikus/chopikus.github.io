@@ -12,14 +12,38 @@
             margin-left: auto;
             margin-right: auto;
         }
+
+        .logo {
+            height: 85px;
+            margin-right: 25px;
+        }
+
+        .logo-img {
+            height: 100%;
+            margin-bottom: 0px;
+            object-fit: scale-down;
+        }
+
+        @media only screen and (max-width: 409px) {
+            .logo {
+                display: none;
+            }
+        }
+
+        .header-div {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: start;
+        }
+
     </style>
   </head>
   <body>
       <header>
-
-      <div style="display:flex; flex-direction: row; align-items: center; justify-content: start;"> 
-          <div style="width: 130px; margin-right: 25px;">
-              <img src="icon.png" style="height: 100%; margin-bottom: 0px;" />
+      <div class="header-div"> 
+          <div class="logo">
+              <img src="icon.png" class="logo-img"/>
           </div>
           <div style="display: flex; flex-direction: column; justify-content: flex-start;">
             <h1 style="margin-bottom: 15px; line-height: 40px; padding: 0px;">Igor Chovpan</h1>
@@ -41,7 +65,7 @@
       </div>
       </header>
       <p>I am a student at University of Toronto studying Computer Science and Mathematics.</p>
-      <p>For a year I worked at Keepit in <abbr title="Beautiful city in Poland. Please don't spell it Cracow">Kraków</abbr> doing backups for cloud services. I was a part of a team launching Azure Devops backup/restore and had a chance to implement some crazy C++ algorithms!</p>   
+      <p>For a year I worked at Keepit in <abbr title="Beautiful city in Poland. Please don't spell it Cracow">Kraków</abbr> doing backups for cloud services. I was a part of a team launching Azure Devops backup/restore and had a chance to implement some powerful C++ algorithms!</p>   
       <p>I am mainly interested in backend development and computing on a large scale, but I am always looking to learn something new! </p>
       <h3>Projects</h3>      
       <h4>rm-exporter</h4>
