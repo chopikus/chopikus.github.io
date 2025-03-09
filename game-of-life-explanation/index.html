@@ -109,9 +109,10 @@
         <p>This algorithm can be best described with code:</p>
 <pre><code>/*Following function pushes coordinates of ON cells in node up with (2^level):1 precision.*/
 fn append_alive_cells(&self, node: Rc<Node>, output: &mut Vec<Cell>, level: u8, x: i64, y: i64, bounds: [i64; 4]) {
-    if !node.n() {
+    /* ignore the node completely if all cells inside are OFF. */
+    <b>if !node.n() {
         return;
-    }
+    } </b>
 
     let size: i64 = 1 << node.k();
     let [min_x, min_y, max_x, max_y] = bounds;
