@@ -1,0 +1,10 @@
+.pizza-gif {
+  width: 40%;
+  height: auto;
+}
+
+.pizza-figure {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
